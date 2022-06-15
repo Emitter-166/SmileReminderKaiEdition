@@ -46,7 +46,7 @@ public class wish extends ListenerAdapter {
                                         .queue();
                                 Main.builder.openPrivateChannelById(e.getAuthor().getId()).flatMap(privateChannel -> privateChannel.sendMessageEmbeds(wishReminder.build())).queue();
                             }
-                        }, 5000);
+                        }, 3600000);
                         break;
 
                     case ".work":
@@ -73,7 +73,7 @@ public class wish extends ListenerAdapter {
                                         .queue();
                                 Main.builder.openPrivateChannelById(e.getAuthor().getId()).flatMap(privateChannel -> privateChannel.sendMessageEmbeds(workReminder.build())).queue();
                             }
-                        }, 5000);
+                        }, 3600000);
                         break;
                 }
 
