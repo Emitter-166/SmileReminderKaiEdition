@@ -9,6 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public class Database extends ListenerAdapter {
@@ -87,9 +88,12 @@ public class Database extends ListenerAdapter {
             createDBConfig(serverId);
             document = (Document) collection.find(new Document("config", serverId)).cursor().next();
         }
-        Document Updatedocument = new Document(key, value +" "+ document.get(key));
-        Bson updateKey = new Document("$set", Updatedocument);
-        collection.updateOne(document, updateKey);
+
+        if(!(Arrays.stream(document.get("users").toString().split(" ")).anyMatch(userId -> userId.equals(value)))){
+            Document Updatedocument = new Document(key, value +" "+ document.get(key));
+            Bson updateKey = new Document("$set", Updatedocument);
+            collection.updateOne(document, updateKey);
+        }
     }
 
     public static void Negative(String Id, String key, Integer value){
