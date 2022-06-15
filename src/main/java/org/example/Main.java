@@ -10,8 +10,9 @@ import javax.security.auth.login.LoginException;
 
 
 public class Main  {
+    public static JDA builder;
     public static void main(String[] args) throws LoginException{
-        JDA builder;
+
         builder = JDABuilder.createLight(System.getenv("token"))
                 .addEventListeners(new wish())
                 .addEventListeners(new Database())
