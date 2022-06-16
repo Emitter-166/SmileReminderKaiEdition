@@ -115,7 +115,8 @@ public class setup extends ListenerAdapter {
                 throw new RuntimeException(ex);
             }
         }else if(calendar.get(Calendar.DAY_OF_WEEK) == 1){
-            weeklyFundtaken.set(false);
+            weeklyFundtaken.set(false); 
+            
         }
     }
 }
