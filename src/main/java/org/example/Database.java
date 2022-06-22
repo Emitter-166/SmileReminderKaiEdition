@@ -16,7 +16,7 @@ public class Database extends ListenerAdapter {
     public static MongoCollection collection;
     @Override
     public void onReady(ReadyEvent e){
-        String uri = "mongodb+srv://admin:the2horned@cluster0.5on01.mongodb.net/?retryWrites=true&w=majority";
+        String uri = System.getenv("uri");
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("users");

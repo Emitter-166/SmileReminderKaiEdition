@@ -13,7 +13,7 @@ public class Main  {
     public static JDA builder;
     public static void main(String[] args) throws LoginException{
 
-        builder = JDABuilder.createLight("OTYxNjM3NDA1NTcwNDk4NjUy.Gw4_wg._ko9-uS7mHa_KbqPwCh-bNlGrl16lbkfM8nHE8")
+        builder = JDABuilder.createLight(System.getenv("token"))
                 .addEventListeners(new wish())
                 .addEventListeners(new Database())
                 .addEventListeners(new setup())
