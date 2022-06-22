@@ -15,108 +15,66 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class setup extends ListenerAdapter {
     AtomicBoolean weeklyFundtaken = new AtomicBoolean(false);
+
     @Override
-    public void onMessageReceived(MessageReceivedEvent e){
+    public void onMessageReceived(MessageReceivedEvent e) {
         User author = e.getAuthor();
-        if(author.isBot()) return;
+        if (author.isBot()) return;
         String[] args = e.getMessage().getContentRaw().split(" ");
 
-        if(args[0].equalsIgnoreCase(".funds") && args.length == 1){
-            //sending info about funds to the user
-            EmbedBuilder funds = new EmbedBuilder();
-            funds.setTitle(String.format("Smile funds for %s:", author.getName()));
-            funds.setColor(Color.cyan);
-            try {
-                funds.setDescription(String.format("`total smile funds for` %s `: %s`", author.getAsMention(), Database.get(author.getId()).get("funds")));
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-            e.getMessage().replyEmbeds(funds.build())
-                    .mentionRepliedUser(false)
-                    .queue();
-            try {
-                if((Integer)Database.get(author.getId()).get("funds") == 0){
-                    EmbedBuilder addFunds = new EmbedBuilder();
-                    addFunds.setTitle("How to add smile to your fund?");
-                    addFunds.addField("",
-                            "**step one: give <@671016674668838952> the amount of smiles you wanna add to your fund** \n" +
-                                    "`note: you will be charges` **200 smiles** `per week and it will be cut from your available fund, " +
-                                    "if you run out of/don't have funds, you cannot use this bot.` \n" +
-                                    "ㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                                    "**step two: Direct message <@671016674668838952> that you have given smiles and you would like to add \n" +
-                                    "it to your fund** \n" +
-                                    "`note: it will take maximum 24 hours to add smiles to your fund` \n" +
-                                    "ㅤㅤㅤㅤㅤㅤㅤㅤ\n", false);
 
-                    e.getMessage().replyEmbeds(addFunds.build())
-                            .mentionRepliedUser(false)
-                            .queue();
+            if (args[0].equalsIgnoreCase(".subscribe")) {
+                //subscribing
+                EmbedBuilder subscribed = new EmbedBuilder()
+                        .setTitle("Subscribed!")
+                        .setDescription("**you will be charged from Saturday + one time subscription fee**")
+                        .setColor(Color.WHITE);
+                e.getChannel().sendMessageEmbeds(subscribed.build()).queue();
+                Database.updateUsers(e.getGuild().getId(), "users", e.getAuthor().getId(), true, false);
+                try {
+                    String message = String.format(Database.confiGet(e.getGuild().getId()).get("actionMessage").toString().replace("user", "%s"), e.getMember().getAsMention());
+                    e.getGuild().getTextChannelById((String) Database.confiGet(e.getGuild().getId()).get("actionChannel")).sendMessage(message).queue();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
                 }
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
+
+            } else if (args[0].equalsIgnoreCase(".unsubscribe")) {
+                //unsubscribing
+                EmbedBuilder subscribed = new EmbedBuilder()
+                        .setTitle("Unsubscribed!")
+                        .setColor(Color.BLACK);
+                e.getChannel().sendMessageEmbeds(subscribed.build()).queue();
+                Database.updateUsers(e.getGuild().getId(), "users", e.getAuthor().getId(), false, true);
+
             }
-
-        }else if((args[0].equalsIgnoreCase(".funds") && args.length == 2)){
-            //sending info about funds to the user about another user
-
-            EmbedBuilder funds = new EmbedBuilder();
-            Member member =  e.getGuild().retrieveMemberById(args[1]).complete();
-            funds.setTitle(String.format("Funds for %s:", member.getEffectiveName()));
-            funds.setColor(Color.cyan);
-            try {
-                funds.setDescription(String.format("`total fund for` %s `: %s`", member.getAsMention(), Database.get(args[1]).get("funds")));
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-            e.getChannel().sendMessageEmbeds(funds.build()).queue();
-        }
-
-
-        if(!(author.getId().equalsIgnoreCase("671016674668838952"))) return;
-        if(args[0].equalsIgnoreCase(".addFund") && args.length == 3){
-            //adding funds to a user
-            Database.PositiveupdateDB(args[1], "funds", Integer.parseInt(args[2]));
-            EmbedBuilder fundsAdded = new EmbedBuilder();
-            fundsAdded.setTitle("Funds added!");
-            fundsAdded.setColor(Color.WHITE);
-            try {
-                fundsAdded.setDescription(String.format("**Funds added for <@%s>!** \n" +
-                        "`total fund for` <@%s> `: %s`", args[1], args[1], Database.get(args[1]).get("funds") ));
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
-            }
-            e.getChannel().sendMessageEmbeds(fundsAdded.build()).queue();
-            Database.updateUsers(e.getGuild().getId(), "users", args[1]);
-
-        }
 
         Calendar calendar = new GregorianCalendar();
-        //charging members certain amounts of smiles every week
-        if(calendar.get(Calendar.DAY_OF_WEEK) == 7){
+            //charging members certain amounts of smiles every week
+            if (calendar.get(Calendar.DAY_OF_WEEK) == 7) {
 
-            try {
-                if(!weeklyFundtaken.get()){
-                    String[] arr = (Database.confiGet(e.getGuild().getId()).get("users").toString().split(" "));
-                    Arrays.stream(arr).forEach(user -> {
-                        Database.Negative(user, "funds", 200);
-                        EmbedBuilder fundTaken = new EmbedBuilder();
-                        fundTaken.setTitle("Weekly fund notice!");
-                        fundTaken.setColor(Color.yellow);
-                        fundTaken.setDescription("**Weekly fund taken. Amount:** `200` \n" +
-                                "**To check your current balance, please do:** `.funds` \n" +
-                                "**charged every saturday**");
-                        fundTaken.setFooter(String.format("%s/%s/%s", calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.YEAR)));
-                        e.getGuild().retrieveMemberById(user).complete().getUser().openPrivateChannel().flatMap(privateChannel -> privateChannel.sendMessageEmbeds(fundTaken.build())).queue();
+                try {
+                    if (!weeklyFundtaken.get()) {
+
+                           String subscribers[] = Database.confiGet(e.getGuild().getId()).get("users").toString().split(" ");
+                        Arrays.stream(subscribers).forEach(subscriberId ->{
+                            String message = null;
+                            try {
+                                message = String.format(Database.confiGet(e.getGuild().getId()).get("actionMessage").toString().replace("user", "%s"),
+                                        e.getGuild().retrieveMemberById(subscriberId).complete().getAsMention());
+                                        e.getGuild().getTextChannelById((String) Database.confiGet(e.getGuild().getId()).get("actionChannel")).sendMessage(message).queue();
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                        });
                         weeklyFundtaken.set(true);
-                    });
+                    }
 
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
                 }
-            } catch (InterruptedException ex) {
-                throw new RuntimeException(ex);
+            } else if (calendar.get(Calendar.DAY_OF_WEEK) == 1) {
+                weeklyFundtaken.set(false);
             }
-        }else if(calendar.get(Calendar.DAY_OF_WEEK) == 1){
-            weeklyFundtaken.set(false); 
-            
         }
     }
-}
+

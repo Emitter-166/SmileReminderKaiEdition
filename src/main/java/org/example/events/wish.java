@@ -12,120 +12,96 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class wish extends ListenerAdapter {
+    //here is reminder and user help cmd
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e){
+        String prefix;
+        try {
+            prefix = Database.confiGet(e.getGuild().getId()).get("prefix").toString();
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
         if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return; 
         try {
-            if((Integer)Database.get(e.getAuthor().getId()).get("funds") > 0){
+            String wish = null;
+            String work = null;
+            String message = null;
+            if ((Boolean) Database.get(e.getAuthor().getId()).get("isSubscribed")) {
                 //wish work command here
-                String message = e.getMessage().getContentRaw();
+                message = e.getMessage().getContentRaw();
+                wish = String.format("%s wish", prefix);
+                work = String.format("%s work", prefix);
 
-                switch (message) {
-                    case ".wish":
-                        EmbedBuilder wishBuilder = new EmbedBuilder();
-                        wishBuilder.setTitle("Reminder set!");
-                        wishBuilder.setDescription("**wish reminder set!** \n" +
-                                "**Don't forget to do** `.wish` **in** <#969147973210607626> \n" +
-                                "**we will remind you soon!**");
-                        e.getMessage().replyEmbeds(wishBuilder.build())
-                                .mentionRepliedUser(false)
-                                .queue();
+                if (message.equals(wish)) {
+                    EmbedBuilder wishBuilder = new EmbedBuilder();
+                    wishBuilder.setTitle("Reminder set!");
+                    wishBuilder.setDescription("**wish reminder set!** \n" +
+                            "**Don't forget to do** `.wish` **in** <#969147973210607626> \n" +
+                            "**we will remind you soon!**");
+                    e.getMessage().replyEmbeds(wishBuilder.build())
+                            .mentionRepliedUser(false)
+                            .queue();
 
-                        Timer wishTimer = new Timer();
-                        wishTimer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                EmbedBuilder wishReminder = new EmbedBuilder();
-                                wishReminder.setTitle("Time for .wish!");
-                                wishReminder.setColor(Color.WHITE);
-                                wishReminder.setDescription("**goto** <#969147973210607626> **and do** `.wish` \n" +
-                                        "**Don't forget to set timer back!**");
-                                e.getMessage().replyEmbeds(wishReminder.build())
-                                        .mentionRepliedUser(false)
-                                        .queue();
-                                Main.builder.openPrivateChannelById(e.getAuthor().getId()).flatMap(privateChannel -> privateChannel.sendMessageEmbeds(wishReminder.build())).queue();
-                            }
-                        }, 3600000);
-                        break;
+                    Timer wishTimer = new Timer();
+                    wishTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            EmbedBuilder wishReminder = new EmbedBuilder();
+                            wishReminder.setTitle("Time for .wish!");
+                            wishReminder.setColor(Color.WHITE);
+                            wishReminder.setDescription("**goto** <#969147973210607626> **and do** `.wish` \n" +
+                                    "**Don't forget to set timer back!**");
+                            e.getMessage().replyEmbeds(wishReminder.build())
+                                    .mentionRepliedUser(true)
+                                    .queue();
+                        }
+                    }, 3600000);
 
-                    case ".work":
-                        EmbedBuilder workBuilder = new EmbedBuilder();
-                        workBuilder.setTitle("Reminder set!");
-                        workBuilder.setDescription("**work reminder set!** \n" +
-                                "**Don't forget to do** `.work` **in** <#969147973210607626> \n" +
-                                "**we will remind you soon!**");
-                        e.getMessage().replyEmbeds(workBuilder.build())
-                                .mentionRepliedUser(false)
-                                .queue();
+                } else if (message.equals(work)) {
+                    EmbedBuilder workBuilder = new EmbedBuilder();
+                    workBuilder.setTitle("Reminder set!");
+                    workBuilder.setDescription("**work reminder set!** \n" +
+                            "**Don't forget to do** `.work` **in** <#969147973210607626> \n" +
+                            "**we will remind you soon!**");
+                    e.getMessage().replyEmbeds(workBuilder.build())
+                            .mentionRepliedUser(false)
+                            .queue();
 
-                        Timer workTimer = new Timer();
-                        workTimer.schedule(new TimerTask() {
-                            @Override
-                            public void run() {
-                                EmbedBuilder workReminder = new EmbedBuilder();
-                                workReminder.setTitle("Time for .work!");
-                                workReminder.setColor(Color.WHITE);
-                                workReminder.setDescription("**goto** <#969147973210607626> **and do** `.work` \n" +
-                                        "**Don't forget to set timer back!**");
-                                e.getMessage().replyEmbeds(workReminder.build())
-                                        .mentionRepliedUser(false)
-                                        .queue();
-                                Main.builder.openPrivateChannelById(e.getAuthor().getId()).flatMap(privateChannel -> privateChannel.sendMessageEmbeds(workReminder.build())).queue();
-                            }
-                        }, 3600000);
-                        break;
+                    Timer workTimer = new Timer();
+                    workTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            EmbedBuilder workReminder = new EmbedBuilder();
+                            workReminder.setTitle("Time for .work!");
+                            workReminder.setColor(Color.WHITE);
+                            workReminder.setDescription("**goto** <#969147973210607626> **and do** `.work` \n" +
+                                    "**Don't forget to set timer back!**");
+                            e.getMessage().replyEmbeds(workReminder.build())
+                                    .mentionRepliedUser(true)
+                                    .queue();
+                        }
+                    }, 3600000);
                 }
-
-            } else if (e.getMessage().getContentRaw().split("")[0].equals(".") && e.getMessage().getContentRaw().split("")[1].equalsIgnoreCase("w") ) {
+            } else if (message.equals(wish) || message.equals(work)) {
                 EmbedBuilder subscribe = new EmbedBuilder();
                 subscribe.setTitle("You can't do that!");
-                subscribe.setDescription("**in order to do that, you must have smile funds on smile reminders. \n" +
-                        "do** `.funds` **for more info** ");
+                subscribe.setDescription("**in order to do that, you must subscribe to this service using** `.subscribe`. \n " +
+                        String.format("**with a weekly charge of %s smiles, you can unsubscribe anytime by** `.unsubscribe` \n", Database.confiGet(e.getGuild().getId()).get("toCut")) +
+                        "**do** `.r help` **for more info** ");
                 e.getMessage().replyEmbeds(subscribe.build()).queue();
-                
+
             }
 
-            if(e.getMessage().getContentRaw().equalsIgnoreCase(".help")){
+            if (message.equalsIgnoreCase(String.format("%s help", prefix))) {
                 EmbedBuilder helpBuilder = new EmbedBuilder();
                 helpBuilder.setTitle("Help");
                 helpBuilder.addField("Commands: ", "" +
-                        "`.wish` **set reminder for using** `.wish` \n" +
-                        "`.work` **set reminder for using** `.work` \n" +
-                        "`.funds` **see your current smile funds using** `.funds` \n" +
-                        "`funds userId` **and other members smile funds using** `.funds userId` \n" +
-                        "**Example:** `.funds 671016674668838952`" +
+                        String.format("`%s` **set reminder for using** `.wish` \n", wish) +
+                        String.format("`%s` **set reminder for using** `.work` \n", work) +
+                        String.format("`.subscribe` **subscribe to use this bot with a charge of %s smiles per week** `.funds` \n", Database.confiGet(e.getGuild().getId()).get("toCut")) +
+                        "`.unsubscribe` **unsubscribe from this service**\n" +
                         "ㅤㅤㅤㅤㅤㅤㅤㅤ", false);
-
-                helpBuilder.addField("How to use?", " ㅤㅤㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                        "**when you use** `.wish/.work` **command on <#969147973210607626> channel \n" +
-                        "do it here too, it will remind you on the exact time when \n" +
-                        "the cool down for those commands ends (one hour)** \n" +
-                        "ㅤㅤㅤㅤㅤㅤㅤㅤ\n", false);
-
-                helpBuilder.addField("Smile funds",
-                        "ㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                                "**What is smile funds?** \n" +
-                                "```In order you use this bot, you have to pay 200 smiles per week (every Saturday)." +
-                                "you have to add funds to your account using smiles to pay that fee``` \n" +
-                                "ㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                                "**How to add funds?** \n" +
-                                "ㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                                "**step one: give <@671016674668838952> the amount of smiles you wanna add to your fund** \n" +
-                                "`note: you will be charges` **200 smiles** `per week and it will be cut from your available fund, " +
-                                "if you run out of/don't have funds, you cannot use this bot.` \n" +
-                                "ㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                                "**step two: Direct message <@671016674668838952> that you have given smiles and you would like to add \n" +
-                                "it to your fund** \n" +
-                                "`note: it will take maximum 24 hours to add smiles to your fund` \n" +
-                                "ㅤㅤㅤㅤㅤㅤㅤㅤ\n", false);
-                helpBuilder.addField("About smile reminder", "" +
-                        "ㅤㅤㅤㅤㅤㅤㅤㅤ\n" +
-                        "```Smile reminder bot(v2) is a open source yet premium bot made to remind users on .wish/.work command cooldown \n" +
-                        "It's not backed or supervised by official kai's haven. half of the funding goes to bot hosting and half to the developer``` ", false);
-
-                helpBuilder.setDescription("**Thank you for choosing Smile reminder bot, it's appreciated :heart:**");
-
                 e.getMessage().replyEmbeds(helpBuilder.build())
                         .mentionRepliedUser(false)
                         .queue();
