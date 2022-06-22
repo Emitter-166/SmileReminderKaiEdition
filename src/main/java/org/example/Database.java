@@ -95,10 +95,10 @@ public class Database extends ListenerAdapter {
 
         Document userDoc;
          try{
-            userDoc = (Document) collection.find(new Document("user", value));
+            userDoc = (Document) collection.find(new Document("user", value)).cursor().next();
         } catch (NoSuchElementException exception){
              createDB(value);
-             userDoc = (Document) collection.find(new Document("user", value));
+             userDoc = (Document) collection.find(new Document("user", value)).cursor().next();
          }
         Document userUpdateDoc = new Document()
                  .append("isSubscribed", isSubscribed);

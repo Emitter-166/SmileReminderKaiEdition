@@ -35,7 +35,9 @@ public class setup extends ListenerAdapter {
                 try {
                     String message = String.format(String.format(Database.confiGet(e.getGuild().getId()).get("actionMessage").toString().replace("user", "%s"), e.getMember().getAsMention())
                             .replace("charge", "%s"), Database.confiGet(e.getGuild().getId()).get("toCut"));
-                    e.getGuild().getTextChannelById((String) Database.confiGet(e.getGuild().getId()).get("actionChannel")).sendMessage(message).queue();
+                    try{
+                        e.getGuild().getTextChannelById((String) Database.confiGet(e.getGuild().getId()).get("actionChannel")).sendMessage(message).queue();
+                    }catch (Exception exception){}
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -85,11 +87,16 @@ public class setup extends ListenerAdapter {
                         EmbedBuilder setupEmbed = new EmbedBuilder()
                                 .setTitle("Setup commands:")
                                 .addField("", "ㅤ\n" +
-                                        "`.prefix prefix` **prefix for the bot, default is** `.r`" +
+                                        "`.prefix prefix` **prefix for the bot, default is** `.r` \n" +
+                                        "ㅤ\n" +
                                         "`.subAmount amount` **weekly amount (smiles) to charge subscribers** \n" +
+                                        "ㅤ\n" +
                                         "`.reminderChannel` **the channel this cmd is used will be reminder channel** \n" +
+                                        "ㅤ\n" +
                                         "`.actionMessage message` **command to use when someone subscribes, please see description for usage guide** \n" +
+                                        "ㅤ\n" +
                                         "`.actionChannel` **the channel this command is used will be set as channel to send the command** \n" +
+                                        "ㅤ\n" +
                                         "ㅤ\n", false)
                                 .addField("Command description: ", "ㅤ\n" +
                                         "`.actionMessage` this message will be the bot command you want to use in order to remove certain amounts of smiles (amount will be defined by \n" +
@@ -99,7 +106,7 @@ public class setup extends ListenerAdapter {
                                         "ㅤ\n" +
                                         "**Example:** \n" +
                                         "ㅤ\n" +
-                                        "if actionMessage is `.remove charge user`, and Emitter subscribes, this message will be sent to actionChannel: `.remove <@671016674668838952> 200 \n" +
+                                        "if actionMessage is `.remove charge user`, and Emitter subscribes, this message will be sent to actionChannel: `.remove` <@671016674668838952> `200` \n" +
                                         "this is just an example, you must set everything up before expecting it to work like this", false)
                                 .setColor(Color.GRAY);
                         e.getMessage().replyEmbeds(setupEmbed.build())

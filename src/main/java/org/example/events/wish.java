@@ -31,15 +31,13 @@ public class wish extends ListenerAdapter {
         }
         if(!(e.getChannel().equals(e.getGuild().getGuildChannelById(channelId)))) return;
         try {
-            String wish = null;
-            String work = null;
-            String message = null;
+
+            String message = e.getMessage().getContentRaw();
+            String wish = String.format("%s wish", prefix);
+            String work = String.format("%s work", prefix);
+
             if ((Boolean) Database.get(e.getAuthor().getId()).get("isSubscribed")) {
                 //wish work command here
-                message = e.getMessage().getContentRaw();
-                wish = String.format("%s wish", prefix);
-                work = String.format("%s work", prefix);
-
                 if (message.equals(wish)) {
                     EmbedBuilder wishBuilder = new EmbedBuilder();
                     wishBuilder.setTitle("Reminder set!");
