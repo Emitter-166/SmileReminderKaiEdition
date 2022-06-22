@@ -64,27 +64,14 @@ public class Database extends ListenerAdapter {
                 .append("prefix", ".r")
                 .append("reminderChannel", "0")
                 .append("users", " ")
-                .append("actionChannel", "")
-                .append("actionMessage", "");
+                .append("actionChannel", " ")
+                .append("actionMessage", " ");
 
         //database template will go here
         collection.insertOne(document);
 
     }
 
-
-    public static void PositiveupdateDB(String Id, String key, Integer value){
-        Document document = null;
-        try{
-            document = (Document) collection.find(new Document("user", Id)).cursor().next();
-        }catch (NoSuchElementException exception){
-            createDB(Id);
-            document = (Document) collection.find(new Document("user", Id)).cursor().next();
-        }
-        Document Updatedocument = new Document(key, value +(Integer) document.get(key)); //it will add old funds and new funds
-        Bson updateKey = new Document("$set", Updatedocument);
-        collection.updateOne(document, updateKey);
-    }
 
     public static void updateUsers(String serverId, String key, String value, boolean isSubscribed, boolean remove){
         Document document = null;
@@ -119,17 +106,18 @@ public class Database extends ListenerAdapter {
          collection.updateOne(userDoc, updateKey);
     }
 
-    public static void Negative(String Id, String key, Integer value){
-        //this is to charge members
-        Document document = null;
+    public static void updateConfig(String serverId, String key, Object value){
+        Document serverConfig = null;
         try{
-            document = (Document) collection.find(new Document("user", Id)).cursor().next();
+            serverConfig = (Document) collection.find(new Document("config", serverId)).cursor().next();
         }catch (NoSuchElementException exception){
-            createDB(Id);
-            document = (Document) collection.find(new Document("user", Id)).cursor().next();
+            createDBConfig(serverId);
+            serverConfig = (Document) collection.find(new Document("config", serverId)).cursor().next();
         }
-        Document Updatedocument = new Document(key, (Integer) document.get(key) - value); //it will add old funds and new funds
-        Bson updateKey = new Document("$set", Updatedocument);
-        collection.updateOne(document, updateKey);
+
+        Document updateDoc = new Document()
+                .append(key, value);
+        Bson updateKey = new Document("$set", updateDoc);
+        collection.updateOne(serverConfig, updateDoc);
     }
 }

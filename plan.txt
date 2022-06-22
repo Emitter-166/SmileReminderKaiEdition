@@ -1,0 +1,17 @@
+whenever someone does .wish .work,
+members will be reminded to use reminder bot
+
+they can subscribe to the bot using .subscribe then use it
+they can unsubscribe using .unsubscribe
+
+they can set reminders with .r wish, and .r work
+
+
+database:
+
+there will be command prefix
+there will be amount to cut
+reminder channel
+subscribers
+action channel
+action message
