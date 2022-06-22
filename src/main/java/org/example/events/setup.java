@@ -26,6 +26,14 @@ public class setup extends ListenerAdapter {
 
             if (args[0].equalsIgnoreCase(".subscribe")) {
                 //subscribing
+                try {
+                    if((boolean) Database.get(e.getAuthor().getId()).get("isSubscribed")){
+                        e.getMessage().reply("`you are already a subscriber of this service!`").queue();
+                        return;
+                    }
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 EmbedBuilder subscribed = new EmbedBuilder()
                         .setTitle("Subscribed!")
                         .setDescription("**you will be charged from Saturday + one time subscription fee**")

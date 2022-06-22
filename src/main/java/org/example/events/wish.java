@@ -8,11 +8,14 @@ import org.example.Database;
 import org.example.Main;
 
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class wish extends ListenerAdapter {
     //here is reminder and user help cmd
+    Map<String, String> prefixes = new HashMap<>();
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e){
@@ -39,11 +42,12 @@ public class wish extends ListenerAdapter {
             if ((Boolean) Database.get(e.getAuthor().getId()).get("isSubscribed")) {
                 //wish work command here
                 if (message.equals(wish)) {
-                    EmbedBuilder wishBuilder = new EmbedBuilder();
-                    wishBuilder.setTitle("Reminder set!");
-                    wishBuilder.setDescription("**wish reminder set!** \n" +
+                    EmbedBuilder wishBuilder = new EmbedBuilder()
+                        .setTitle("Reminder set!")
+                        .setDescription("**wish reminder set!** \n" +
                             "**Don't forget to do** `.wish` **in** <#969147973210607626> \n" +
-                            "**we will remind you soon!**");
+                            "**we will remind you soon!**")
+                        .setColor(Color.black);
                     e.getMessage().replyEmbeds(wishBuilder.build())
                             .mentionRepliedUser(false)
                             .queue();
@@ -52,10 +56,10 @@ public class wish extends ListenerAdapter {
                     wishTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            EmbedBuilder wishReminder = new EmbedBuilder();
-                            wishReminder.setTitle("Time for .wish!");
-                            wishReminder.setColor(Color.WHITE);
-                            wishReminder.setDescription("**goto** <#969147973210607626> **and do** `.wish` \n" +
+                            EmbedBuilder wishReminder = new EmbedBuilder()
+                                .setTitle("Time for .wish!")
+                                .setColor(Color.WHITE)
+                                .setDescription("**goto** <#969147973210607626> **and do** `.wish` \n" +
                                     "**Don't forget to set timer back!**");
                             e.getMessage().replyEmbeds(wishReminder.build())
                                     .mentionRepliedUser(true)

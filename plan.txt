@@ -15,3 +15,9 @@ reminder channel
 subscribers
 action channel
 action message
+
+all done time to:
+speed up prefix thingy
+make sure people cant subscribe again n again (done)
+
+just need to add timer where it will send advertisement of this bot, and then done!
