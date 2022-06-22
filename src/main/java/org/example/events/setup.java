@@ -105,6 +105,8 @@ public class setup extends ListenerAdapter {
                                         "ㅤ\n" +
                                         "`.actionChannel` **the channel this command is used will be set as channel to send the command** \n" +
                                         "ㅤ\n" +
+                                        "`.messagesBeforeAd` **After how many message the bot should send it's promotion**" +
+                                        "ㅤ\n" +
                                         "ㅤ\n", false)
                                 .addField("Command description: ", "ㅤ\n" +
                                         "`.actionMessage` this message will be the bot command you want to use in order to remove certain amounts of smiles (amount will be defined by \n" +
@@ -127,7 +129,6 @@ public class setup extends ListenerAdapter {
                         e.getMessage().reply("`prefix set!`")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        e.getMessage().delete().queue();
                         Database.updateConfig(e.getGuild().getId(), "prefix", args[1]);
                         break;
 
@@ -135,7 +136,6 @@ public class setup extends ListenerAdapter {
                         e.getMessage().reply("`subscription charge set!`")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        e.getMessage().delete().queue();
                         Database.updateConfig(e.getGuild().getId(), "toCut", args[1]);
                         break;
 
@@ -143,7 +143,6 @@ public class setup extends ListenerAdapter {
                         e.getMessage().reply("`reminder channel set!`")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        e.getMessage().delete().queue();
                         Database.updateConfig(e.getGuild().getId(), "reminderChannel", e.getChannel().getId());
                         break;
 
@@ -163,8 +162,14 @@ public class setup extends ListenerAdapter {
                         e.getMessage().reply("`Action channel set!`")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        e.getMessage().delete().queue();
                         Database.updateConfig(e.getGuild().getId(), "actionChannel", e.getChannel().getId());
+                        break;
+
+                    case ".messagesBeforeAd":
+                        e.getMessage().reply("`Message amount before promotion set!`")
+                                .mentionRepliedUser(false)
+                                .queue();
+                        Database.updateConfig(e.getGuild().getId(), "messageAmountBeforeAd", args[1]);
                         break;
                 }
             }

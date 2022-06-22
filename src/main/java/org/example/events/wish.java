@@ -1,6 +1,8 @@
 package org.example.events;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -102,7 +104,7 @@ public class wish extends ListenerAdapter {
 
             }
 
-            if (message.equalsIgnoreCase(String.format("%s help", prefix))) {
+            if (message.equalsIgnoreCase(String.format("%s help", prefix)) || (message.equalsIgnoreCase(".help") && !e.getMember().hasPermission(Permission.ADMINISTRATOR))) {
                 EmbedBuilder helpBuilder = new EmbedBuilder();
                 helpBuilder.setTitle("Help");
                 helpBuilder.addField("Commands: ", "" +
@@ -115,6 +117,11 @@ public class wish extends ListenerAdapter {
                         .mentionRepliedUser(false)
                         .queue();
             }
+
+            if(message.equalsIgnoreCase(".wish") || message.equalsIgnoreCase(".work")){
+
+            }
+
 
         } catch (InterruptedException ex) {
             throw new RuntimeException(ex);

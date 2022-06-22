@@ -65,7 +65,8 @@ public class Database extends ListenerAdapter {
                 .append("reminderChannel", "0")
                 .append("users", " ")
                 .append("actionChannel", " ")
-                .append("actionMessage", " ");
+                .append("actionMessage", " ")
+                .append("messageAmountBeforeAd", "20");
 
         //database template will go here
         collection.insertOne(document);
