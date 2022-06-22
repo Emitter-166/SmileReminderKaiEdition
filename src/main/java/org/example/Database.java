@@ -16,7 +16,7 @@ public class Database extends ListenerAdapter {
     public static MongoCollection collection;
     @Override
     public void onReady(ReadyEvent e){
-        String uri = System.getenv("uri");
+        String uri = "mongodb+srv://admin:the2horned@cluster0.5on01.mongodb.net/?retryWrites=true&w=majority";
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("users");
@@ -118,6 +118,6 @@ public class Database extends ListenerAdapter {
         Document updateDoc = new Document()
                 .append(key, value);
         Bson updateKey = new Document("$set", updateDoc);
-        collection.updateOne(serverConfig, updateDoc);
+        collection.updateOne(serverConfig, updateKey);
     }
 }
