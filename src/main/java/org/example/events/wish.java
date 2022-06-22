@@ -22,7 +22,14 @@ public class wish extends ListenerAdapter {
         } catch (InterruptedException ex) {
             throw new RuntimeException(ex);
         }
-        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return; 
+        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
+        String channelId = null;
+        try {
+            channelId = Database.confiGet(e.getGuild().getId()).get("reminderChannel").toString();
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+        if(!(e.getChannel().equals(e.getGuild().getGuildChannelById(channelId)))) return;
         try {
             String wish = null;
             String work = null;
